@@ -1,0 +1,1218 @@
+--[[
+    Script: Maru Hub Premium v3 - Blox Fruits
+    Author: KhDang
+    Version: 3.0
+--]]
+
+-- // Services
+local HttpService = game:GetService("HttpService")
+local Players = game:GetService("Players")
+local LP = Players.LocalPlayer
+local RunService = game:GetService("RunService")
+local UserInputService = game:GetService("UserInputService")
+local TweenService = game:GetService("TweenService")
+local VirtualInputManager = game:GetService("VirtualInputManager")
+local CoreGui = game:GetService("CoreGui")
+local Lighting = game:GetService("Lighting")
+local Workspace = game:GetService("Workspace")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local TeleportService = game:GetService("TeleportService")
+local StarterGui = game:GetService("StarterGui")
+local LocalizationService = game:GetService("LocalizationService")
+
+-- // Wait for game to load
+repeat task.wait() until game:IsLoaded()
+repeat task.wait() until LP and LP.Character
+
+-- // Execute Auto-Load
+local success, err = pcall(function()
+    loadstring(game:HttpGet("https://raw.githubusercontent.com/AnhDangNhoEm/TuanAnhIOS/refs/heads/main/koby"))()
+end)
+
+if not success then
+    warn("Falha ao executar auto-load:", err)
+end
+
+-- // Load Fluent UI Library
+local Fluent = loadstring(game:HttpGet("https://github.com/dawid-scripts/Fluent/releases/latest/download/main.lua"))()
+local SaveManager = loadstring(game:HttpGet("https://raw.githubusercontent.com/dawid-scripts/Fluent/master/Addons/SaveManager.lua"))()
+local InterfaceManager = loadstring(game:HttpGet("https://raw.githubusercontent.com/dawid-scripts/Fluent/master/Addons/InterfaceManager.lua"))()
+
+-- // Create Window
+local Window = Fluent:CreateWindow({
+    Title = "Maru Hub Premium v3",
+    SubTitle = "Blox Fruits | By KhDang",
+    TabWidth = 160,
+    Size = UDim2.fromOffset(580, 420),
+    Acrylic = true,
+    Theme = "Darker",
+    MinimizeKey = Enum.KeyCode.RightControl
+})
+
+-- // Save Manager
+SaveManager:SetLibrary(Fluent)
+InterfaceManager:SetLibrary(Fluent)
+
+SaveManager:IgnoreThemeSettings()
+SaveManager:SetIgnoreIndexes({})
+
+InterfaceManager:SetFolder("MaruHub")
+SaveManager:SetFolder("MaruHub/bloxfruits")
+
+-- // Intro Screen
+local function ShowIntro()
+    local ScreenGui = Instance.new("ScreenGui")
+    ScreenGui.Name = "IntroGui"
+    ScreenGui.ResetOnSpawn = false
+    ScreenGui.Parent = CoreGui
+
+    local MainFrame = Instance.new("Frame")
+    MainFrame.Size = UDim2.new(1, 0, 1, 0)
+    MainFrame.BackgroundColor3 = Color3.fromRGB(10, 10, 15)
+    MainFrame.BackgroundTransparency = 0
+    MainFrame.Parent = ScreenGui
+
+    local CenterFrame = Instance.new("Frame")
+    CenterFrame.Size = UDim2.new(0, 500, 0, 300)
+    CenterFrame.Position = UDim2.new(0.5, -250, 0.5, -150)
+    CenterFrame.BackgroundColor3 = Color3.fromRGB(20, 20, 30)
+    CenterFrame.BackgroundTransparency = 0.2
+    CenterFrame.BorderSizePixel = 2
+    CenterFrame.BorderColor3 = Color3.fromRGB(100, 150, 255)
+    CenterFrame.Parent = MainFrame
+
+    local Corner = Instance.new("UICorner")
+    Corner.CornerRadius = UDim.new(0, 20)
+    Corner.Parent = CenterFrame
+
+    local Title = Instance.new("TextLabel")
+    Title.Size = UDim2.new(1, 0, 0, 60)
+    Title.Position = UDim2.new(0, 0, 0.1, 0)
+    Title.BackgroundTransparency = 1
+    Title.Font = Enum.Font.GothamBold
+    Title.TextSize = 30
+    Title.TextColor3 = Color3.fromRGB(100, 200, 255)
+    Title.Text = "Maru Hub Premium v3"
+    Title.Parent = CenterFrame
+
+    local SubTitle = Instance.new("TextLabel")
+    SubTitle.Size = UDim2.new(1, 0, 0, 40)
+    SubTitle.Position = UDim2.new(0, 0, 0.25, 0)
+    SubTitle.BackgroundTransparency = 1
+    SubTitle.Font = Enum.Font.GothamSemibold
+    SubTitle.TextSize = 18
+    SubTitle.TextColor3 = Color3.fromRGB(200, 200, 255)
+    SubTitle.Text = "Script by KhDang"
+    SubTitle.Parent = CenterFrame
+
+    local Desc = Instance.new("TextLabel")
+    Desc.Size = UDim2.new(1, 0, 0, 80)
+    Desc.Position = UDim2.new(0, 0, 0.4, 0)
+    Desc.BackgroundTransparency = 1
+    Desc.Font = Enum.Font.Gotham
+    Desc.TextSize = 14
+    Desc.TextColor3 = Color3.fromRGB(180, 180, 200)
+    Desc.Text = "✨ Best Script for Blox Fruits\n🔥 Auto Farm | Auto Raid | Sea Events\n⚡ Fast & Stable"
+    Desc.Parent = CenterFrame
+
+    local Loading = Instance.new("TextLabel")
+    Loading.Size = UDim2.new(1, 0, 0, 30)
+    Loading.Position = UDim2.new(0, 0, 0.75, 0)
+    Loading.BackgroundTransparency = 1
+    Loading.Font = Enum.Font.Gotham
+    Loading.TextSize = 14
+    Loading.TextColor3 = Color3.fromRGB(150, 150, 200)
+    Loading.Text = "Loading..."
+    Loading.Parent = CenterFrame
+
+    task.spawn(function()
+        local dots = 0
+        while ScreenGui.Parent do
+            dots = (dots % 3) + 1
+            Loading.Text = "Loading" .. string.rep(".", dots)
+            task.wait(0.4)
+        end
+    end)
+
+    task.spawn(function()
+        local hue = 0
+        while ScreenGui.Parent do
+            hue = (hue + 0.005) % 1
+            CenterFrame.BorderColor3 = Color3.fromHSV(hue, 0.8, 1)
+            task.wait(0.05)
+        end
+    end)
+
+    task.wait(2.5)
+
+    TweenService:Create(MainFrame, TweenInfo.new(0.8, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
+        BackgroundTransparency = 1
+    }):Play()
+
+    task.wait(0.8)
+    ScreenGui:Destroy()
+end
+
+task.spawn(ShowIntro)
+task.wait(1.5)
+
+-- // Tabs
+local Tabs = {
+    Main = Window:AddTab({ Title = "Main", Icon = "home" }),
+    Farm = Window:AddTab({ Title = "Farm", Icon = "sword" }),
+    Raid = Window:AddTab({ Title = "Raid", Icon = "shield" }),
+    Sea = Window:AddTab({ Title = "Sea Events", Icon = "anchor" }),
+    Race = Window:AddTab({ Title = "Race", Icon = "star" }),
+    Misc = Window:AddTab({ Title = "Misc", Icon = "cog" }),
+    Settings = Window:AddTab({ Title = "Settings", Icon = "sliders" }),
+    ESP = Window:AddTab({ Title = "ESP", Icon = "eye" }),
+    PVP = Window:AddTab({ Title = "PVP", Icon = "crosshair" }),
+}
+-- //==================== MAIN TAB ====================//
+local MainTab = Tabs.Main
+
+local StatusSection = MainTab:AddSection("Status")
+
+local PlayerInfo = MainTab:AddParagraph("PlayerInfo", {
+    Title = "Player Information",
+    Content = "Loading..."
+})
+
+local function UpdatePlayerInfo()
+    local player = LP
+    if player and player.Data then
+        local level = player.Data.Level.Value or 0
+        local beli = player.Data.Beli.Value or 0
+        local fragments = player.Data.Fragments and player.Data.Fragments.Value or 0
+        local race = player.Data.Race.Value or "Unknown"
+        local fruit = player.Data.DevilFruit.Value or "None"
+        
+        PlayerInfo:SetDesc(string.format(
+            "Level: %d | Beli: %s | Fragments: %s\nRace: %s | Fruit: %s",
+            level,
+            tostring(beli):reverse():gsub("(%d%d%d)", "%1,"):reverse():gsub("^,", ""),
+            tostring(fragments):reverse():gsub("(%d%d%d)", "%1,"):reverse():gsub("^,", ""),
+            race,
+            fruit
+        ))
+    end
+end
+
+task.spawn(function()
+    while true do
+        pcall(UpdatePlayerInfo)
+        task.wait(2)
+    end
+end)
+
+local World1 = false
+local World2 = false
+local World3 = false
+
+local PlaceId = game.PlaceId
+if PlaceId == 2753915549 then
+    World1 = true
+elseif PlaceId == 4442272183 then
+    World2 = true
+elseif PlaceId == 7449423635 then
+    World3 = true
+else
+    LP:Kick("Unsupported Game")
+end
+
+local TeleportSection = MainTab:AddSection("Teleport")
+
+MainTab:AddButton("TeleportOldWorld", {
+    Title = "Teleport to Old World",
+    Callback = function()
+        pcall(function()
+            ReplicatedStorage.Remotes.CommF_:InvokeServer("TravelMain")
+        end)
+    end
+})
+
+MainTab:AddButton("TeleportNewWorld", {
+    Title = "Teleport to New World",
+    Callback = function()
+        pcall(function()
+            ReplicatedStorage.Remotes.CommF_:InvokeServer("TravelDressrosa")
+        end)
+    end
+})
+
+MainTab:AddButton("TeleportThirdSea", {
+    Title = "Teleport to Third Sea",
+    Callback = function()
+        pcall(function()
+            ReplicatedStorage.Remotes.CommF_:InvokeServer("TravelZou")
+        end)
+    end
+})
+
+local WorldInfo = MainTab:AddParagraph("WorldInfo", {
+    Title = "World Information",
+    Content = "Loading..."
+})
+
+task.spawn(function()
+    while true do
+        local world = "Unknown"
+        if World1 then world = "Old World (First Sea)" end
+        if World2 then world = "New World (Second Sea)" end
+        if World3 then world = "Third Sea" end
+        WorldInfo:SetDesc("Current World: " .. world)
+        task.wait(5)
+    end
+end)
+
+-- //==================== FARM TAB ====================//
+local FarmTab = Tabs.Farm
+
+local FarmSection = FarmTab:AddSection("Farm Settings")
+
+local FarmToggle = FarmTab:AddToggle("FarmToggle", {
+    Title = "Auto Farm Level",
+    Default = false,
+    Callback = function(value)
+        getgenv().AutoFarm = value
+        if not value then
+            StopTween()
+            getgenv().StartMagnet = false
+        end
+    end
+})
+
+local FarmMode = FarmTab:AddDropdown("FarmMode", {
+    Title = "Farm Mode",
+    Values = { "Farm Level", "Farm Bone", "Farm Katakuri" },
+    Default = 1,
+    Callback = function(value)
+        getgenv().FarmMode = value
+    end
+})
+
+local WeaponSection = FarmTab:AddSection("Weapon Settings")
+
+local WeaponDropdown = FarmTab:AddDropdown("WeaponSelect", {
+    Title = "Select Weapon Type",
+    Values = { "Melee", "Sword", "Blox Fruit" },
+    Default = 1,
+    Callback = function(value)
+        getgenv().SelectWeapon = value
+    end
+})
+
+task.spawn(function()
+    while true do
+        pcall(function()
+            if getgenv().AutoFarm or getgenv().AutoMaterial or getgenv().MasteryFarm then
+                local weaponType = getgenv().SelectWeapon or "Melee"
+                local backpack = LP.Backpack
+                local character = LP.Character
+                
+                for _, tool in ipairs(backpack:GetChildren()) do
+                    if tool:IsA("Tool") and tool.ToolTip == weaponType then
+                        if not character:FindFirstChild(tool.Name) then
+                            character.Humanoid:EquipTool(tool)
+                        end
+                        break
+                    end
+                end
+            end
+        end)
+        task.wait(0.5)
+    end
+end)
+
+local MaterialSection = FarmTab:AddSection("Material Farm")
+
+local MaterialList = {}
+if World1 then
+    MaterialList = { "Leather + Scrap Metal", "Angel Wings", "Magma Ore", "Fish Tail" }
+elseif World2 then
+    MaterialList = { "Leather + Scrap Metal", "Radioactive Material", "Ectoplasm", "Mystic Droplet", "Magma Ore", "Vampire Fang" }
+elseif World3 then
+    MaterialList = { "Leather + Scrap Metal", "Demonic Wisp", "Conjured Cocoa", "Dragon Scale", "Gunpowder", "Fish Tail", "Mini Tusk" }
+end
+
+local MaterialDropdown = FarmTab:AddDropdown("MaterialSelect", {
+    Title = "Select Material",
+    Values = MaterialList,
+    Callback = function(value)
+        getgenv().SelectMaterial = value
+    end
+})
+
+local MaterialToggle = FarmTab:AddToggle("MaterialToggle", {
+    Title = "Farm Material",
+    Default = false,
+    Callback = function(value)
+        getgenv().AutoMaterial = value
+        if not value then
+            StopTween()
+            getgenv().StartMagnet = false
+        end
+    end
+})
+
+local MasterySection = FarmTab:AddSection("Mastery Farm")
+
+local MasteryToggle = FarmTab:AddToggle("MasteryToggle", {
+    Title = "Auto Farm Mastery",
+    Default = false,
+    Callback = function(value)
+        getgenv().MasteryFarm = value
+        if not value then
+            StopTween()
+            getgenv().StartMagnet = false
+        end
+    end
+})
+
+local MasteryMode = FarmTab:AddDropdown("MasteryMode", {
+    Title = "Mastery Mode",
+    Values = { "Blox Fruit", "Gun" },
+    Default = 1,
+    Callback = function(value)
+        getgenv().FarmMode2 = value
+    end
+})
+
+local SkillSection = FarmTab:AddSection("Mastery Skills")
+
+local SkillZ = FarmTab:AddToggle("SkillZ", {
+    Title = "Skill Z",
+    Default = true,
+    Callback = function(value)
+        getgenv().SkillZ = value
+    end
+})
+
+local SkillX = FarmTab:AddToggle("SkillX", {
+    Title = "Skill X",
+    Default = false,
+    Callback = function(value)
+        getgenv().SkillX = value
+    end
+})
+
+local SkillC = FarmTab:AddToggle("SkillC", {
+    Title = "Skill C",
+    Default = false,
+    Callback = function(value)
+        getgenv().SkillC = value
+    end
+})
+
+local SkillV = FarmTab:AddToggle("SkillV", {
+    Title = "Skill V",
+    Default = false,
+    Callback = function(value)
+        getgenv().SkillV = value
+    end
+})
+
+local SkillF = FarmTab:AddToggle("SkillF", {
+    Title = "Skill F",
+    Default = false,
+    Callback = function(value)
+        getgenv().SkillF = value
+    end
+})
+
+local BossSection = FarmTab:AddSection("Boss Farm")
+
+local BossList = {}
+if World1 then
+    BossList = { "The Gorilla King", "Bobby", "Yeti", "Mob Leader", "Vice Admiral", "Warden", "Chief Warden", "Swan", "Magma Admiral", "Fishman Lord", "Wysper", "Thunder God", "Cyborg", "Saber Expert" }
+elseif World2 then
+    BossList = { "Diamond", "Jeremy", "Fajita", "Don Swan", "Smoke Admiral", "Cursed Captain", "Darkbeard", "Order", "Awakened Ice Admiral", "Tide Keeper" }
+elseif World3 then
+    BossList = { "Stone", "Island Empress", "Kilo Admiral", "Captain Elephant", "Beautiful Pirate", "rip_indra True Form", "Longma", "Soul Reaper", "Cake Queen", "Cake Prince", "Dough King" }
+end
+
+local BossDropdown = FarmTab:AddDropdown("BossSelect", {
+    Title = "Select Boss",
+    Values = BossList,
+    Callback = function(value)
+        getgenv().SelectBoss = value
+    end
+})
+
+local BossToggle = FarmTab:AddToggle("BossToggle", {
+    Title = "Auto Kill Boss",
+    Default = false,
+    Callback = function(value)
+        getgenv().AutoFarmBoss = value
+        if not value then
+            StopTween()
+        end
+    end
+})
+
+local AllBossToggle = FarmTab:AddToggle("AllBossToggle", {
+    Title = "Auto Kill All Bosses",
+    Default = false,
+    Callback = function(value)
+        getgenv().AutoFarmAllBoss = value
+        if not value then
+            StopTween()
+        end
+    end
+})
+
+local FarmSettingsSection = FarmTab:AddSection("Farm Settings")
+
+local HakiToggle = FarmTab:AddToggle("HakiToggle", {
+    Title = "Auto Buso Haki",
+    Default = true,
+    Callback = function(value)
+        getgenv().AUTOHAKI = value
+    end
+})
+
+local MagnetToggle = FarmTab:AddToggle("MagnetToggle", {
+    Title = "Bring Mob",
+    Default = true,
+    Callback = function(value)
+        getgenv().BringMonster = value
+    end
+})
+
+local SpinToggle = FarmTab:AddToggle("SpinToggle", {
+    Title = "Spin Position",
+    Default = true,
+    Callback = function(value)
+        getgenv().SpinPos = value
+    end
+})
+
+local DistanceSlider = FarmTab:AddSlider("DistanceSlider", {
+    Title = "Farm Distance",
+    Default = 15,
+    Min = 0,
+    Max = 30,
+    Rounding = 5,
+    Callback = function(value)
+        getgenv().PosY = value
+    end
+})
+-- //==================== RAID TAB ====================//
+local RaidTab = Tabs.Raid
+
+local RaidSection = RaidTab:AddSection("Raid Settings")
+
+local RaidDropdown = RaidTab:AddDropdown("RaidSelect", {
+    Title = "Select Raid",
+    Values = { "Dark", "Sand", "Magma", "Rumble", "Flame", "Ice", "Light", "Quake", "Buddha", "Spider", "Phoenix", "Dough" },
+    Default = 1,
+    Callback = function(value)
+        getgenv().SelectChip = value
+    end
+})
+
+local RaidToggle = RaidTab:AddToggle("RaidToggle", {
+    Title = "Auto Raid",
+    Default = false,
+    Callback = function(value)
+        getgenv().Auto_Dungeon = value
+    end
+})
+
+local AwakenToggle = RaidTab:AddToggle("AwakenToggle", {
+    Title = "Auto Awaken Fruit",
+    Default = false,
+    Callback = function(value)
+        getgenv().AutoAwaken = value
+    end
+})
+
+-- //==================== SEA EVENTS TAB ====================//
+local SeaTab = Tabs.Sea
+
+local BoatSection = SeaTab:AddSection("Boat Settings")
+
+local BoatDropdown = SeaTab:AddDropdown("BoatSelect", {
+    Title = "Select Boat",
+    Values = { "Guardian", "PirateGrandBrigade", "MarineGrandBrigade", "PirateBrigade", "MarineBrigade", "PirateSloop", "MarineSloop", "BeastHunter" },
+    Default = 1,
+    Callback = function(value)
+        getgenv().SelectedBoat = value
+    end
+})
+
+local SpeedDropdown = SeaTab:AddDropdown("SpeedSelect", {
+    Title = "Boat Speed",
+    Values = { "180", "200", "250", "300", "325", "350" },
+    Default = 4,
+    Callback = function(value)
+        getgenv().SpeedBoat = tonumber(value)
+    end
+})
+
+local SeaToggle = SeaTab:AddToggle("SeaToggle", {
+    Title = "Auto Sea Event",
+    Default = false,
+    Callback = function(value)
+        getgenv().SailBoat = value
+        if not value then
+            StopTween()
+        end
+    end
+})
+
+local RockToggle = SeaTab:AddToggle("RockToggle", {
+    Title = "Go Through Rocks",
+    Default = true,
+    Callback = function(value)
+        getgenv().GoThroughRocks = value
+    end
+})
+
+local CreatureSection = SeaTab:AddSection("Sea Creatures")
+
+local SharkToggle = SeaTab:AddToggle("SharkToggle", {
+    Title = "Auto Kill Shark",
+    Default = false,
+    Callback = function(value)
+        getgenv().AutoKillShark = value
+    end
+})
+
+local PiranhaToggle = SeaTab:AddToggle("PiranhaToggle", {
+    Title = "Auto Kill Piranha",
+    Default = false,
+    Callback = function(value)
+        getgenv().AutoKillPiranha = value
+    end
+})
+
+local FishCrewToggle = SeaTab:AddToggle("FishCrewToggle", {
+    Title = "Auto Kill Fish Crew",
+    Default = false,
+    Callback = function(value)
+        getgenv().AutoKillFishCrew = value
+    end
+})
+
+local TerrorsharkToggle = SeaTab:AddToggle("TerrorsharkToggle", {
+    Title = "Auto Terror Shark",
+    Default = false,
+    Callback = function(value)
+        getgenv().AutoTerrorshark = value
+    end
+})
+
+local SeaBeastToggle = SeaTab:AddToggle("SeaBeastToggle", {
+    Title = "Auto Sea Beast",
+    Default = false,
+    Callback = function(value)
+        getgenv().AutoSeaBest = value
+        if not value then
+            getgenv().SeaSkill = false
+            getgenv().Skillaimbot = false
+        end
+    end
+})
+
+local GhostSection = SeaTab:AddSection("Ghost Ship")
+
+local GhostShipToggle = SeaTab:AddToggle("GhostShipToggle", {
+    Title = "Auto Ghost Ship",
+    Default = false,
+    Callback = function(value)
+        getgenv().RelzFishBoat = value
+        if not value then
+            getgenv().SeaSkill = false
+            getgenv().Skillaimbot = false
+        end
+    end
+})
+
+local PirateBrigadeToggle = SeaTab:AddToggle("PirateBrigadeToggle", {
+    Title = "Auto Pirate Brigade",
+    Default = false,
+    Callback = function(value)
+        getgenv().RelzPirateBrigade = value
+    end
+})
+
+local PirateGrandToggle = SeaTab:AddToggle("PirateGrandToggle", {
+    Title = "Auto Pirate Grand Brigade",
+    Default = false,
+    Callback = function(value)
+        getgenv().RelzPirateGrandBrigade = value
+    end
+})
+
+-- //==================== RACE TAB ====================//
+local RaceTab = Tabs.Race
+
+local RaceV2Section = RaceTab:AddSection("Race V2")
+
+local RaceV2Toggle = RaceTab:AddToggle("RaceV2Toggle", {
+    Title = "Auto Upgrade Race V2",
+    Default = false,
+    Callback = function(value)
+        getgenv().UpgradeRaceV2 = value
+    end
+})
+
+local CyborgSection = RaceTab:AddSection("Cyborg")
+
+local CyborgToggle = RaceTab:AddToggle("CyborgToggle", {
+    Title = "Auto Get Cyborg",
+    Default = false,
+    Callback = function(value)
+        getgenv().AutoCyborg = value
+    end
+})
+
+local GhoulSection = RaceTab:AddSection("Ghoul")
+
+local GhoulToggle = RaceTab:AddToggle("GhoulToggle", {
+    Title = "Auto Get Ghoul",
+    Default = false,
+    Callback = function(value)
+        getgenv().AutoGhoul = value
+    end
+})
+
+local RaceV4Section = RaceTab:AddSection("Race V4")
+
+local RaceV4Toggle = RaceTab:AddToggle("RaceV4Toggle", {
+    Title = "Auto Trial Race",
+    Default = false,
+    Callback = function(value)
+        getgenv().AutoTrialRace = value
+    end
+})
+
+local KillPlayerToggle = RaceTab:AddToggle("KillPlayerToggle", {
+    Title = "Auto Kill Players After Trial",
+    Default = false,
+    Callback = function(value)
+        getgenv().AutoKillPlayerAfterTrial = value
+    end
+})
+
+local GearToggle = RaceTab:AddToggle("GearToggle", {
+    Title = "Auto Buy Gear",
+    Default = false,
+    Callback = function(value)
+        getgenv().AutoBuyGear = value
+    end
+})
+
+local NoFrogToggle = RaceTab:AddToggle("NoFrogToggle", {
+    Title = "No Frog",
+    Default = false,
+    Callback = function(value)
+        getgenv().NoFrog = value
+    end
+})
+
+-- //==================== MISC TAB ====================//
+local MiscTab = Tabs.Misc
+
+local FruitSection = MiscTab:AddSection("Devil Fruit")
+
+local RandomFruitToggle = MiscTab:AddToggle("RandomFruitToggle", {
+    Title = "Random Devil Fruit",
+    Default = false,
+    Callback = function(value)
+        getgenv().RandomFruit = value
+    end
+})
+
+local StoreFruitToggle = MiscTab:AddToggle("StoreFruitToggle", {
+    Title = "Auto Store Fruit",
+    Default = false,
+    Callback = function(value)
+        getgenv().AutoStoreFruit = value
+    end
+})
+
+local SwordSection = MiscTab:AddSection("Legendary Sword")
+
+local SwordToggle = MiscTab:AddToggle("SwordToggle", {
+    Title = "Auto Buy Legendary Sword",
+    Default = false,
+    Callback = function(value)
+        getgenv().AutoBuyLegendarySword = value
+    end
+})
+
+local ColorSection = MiscTab:AddSection("Haki Color")
+
+local ColorToggle = MiscTab:AddToggle("ColorToggle", {
+    Title = "Auto Buy Haki Color",
+    Default = false,
+    Callback = function(value)
+        getgenv().Auto_Buy_Enchancement = value
+    end
+})
+
+local RainbowToggle = MiscTab:AddToggle("RainbowToggle", {
+    Title = "Auto Get Rainbow Haki",
+    Default = false,
+    Callback = function(value)
+        getgenv().AutoRainbowHaki = value
+    end
+})
+
+local WeaponGetSection = MiscTab:AddSection("Get Weapons")
+
+local CDKToggle = MiscTab:AddToggle("CDKToggle", {
+    Title = "Auto Get CDK",
+    Default = false,
+    Callback = function(value)
+        getgenv().AutoGetCDK = value
+    end
+})
+
+local YamaToggle = MiscTab:AddToggle("YamaToggle", {
+    Title = "Auto Yama",
+    Default = false,
+    Callback = function(value)
+        getgenv().AutoYama = value
+    end
+})
+
+local TushitaToggle = MiscTab:AddToggle("TushitaToggle", {
+    Title = "Auto Tushita",
+    Default = false,
+    Callback = function(value)
+        getgenv().AutoTushita = value
+    end
+})
+
+local SaberToggle = MiscTab:AddToggle("SaberToggle", {
+    Title = "Auto Saber",
+    Default = false,
+    Callback = function(value)
+        getgenv().AutoSaber = value
+    end
+})
+
+local GuitarSection = MiscTab:AddSection("Skull Guitar")
+
+local GuitarToggle = MiscTab:AddToggle("GuitarToggle", {
+    Title = "Auto Skull Guitar",
+    Default = false,
+    Callback = function(value)
+        getgenv().AutoSkullGuitar = value
+    end
+})
+
+-- //==================== SETTINGS TAB ====================//
+local SettingsTab = Tabs.Settings
+
+local UISection = SettingsTab:AddSection("UI Settings")
+
+local ThemeDropdown = SettingsTab:AddDropdown("ThemeSelect", {
+    Title = "Theme",
+    Values = { "Darker", "Dark", "Light", "Blue", "Red", "Green", "Purple", "Pink" },
+    Default = 1,
+    Callback = function(value)
+        Fluent:SetTheme(value)
+    end
+})
+
+local ToggleUI = SettingsTab:AddToggle("ToggleUI", {
+    Title = "Toggle UI",
+    Default = true,
+    Callback = function(value)
+        Window:SetVisible(value)
+    end
+})
+
+local KeybindInput = SettingsTab:AddInput("KeybindInput", {
+    Title = "Toggle UI Keybind",
+    Default = "End",
+    Placeholder = "Key",
+    Numeric = false,
+    Finished = true,
+    Callback = function(value)
+        local key = Enum.KeyCode[value]
+        if key then
+            Window:SetMinimizeKey(key)
+        end
+    end
+})
+
+local GameSection = SettingsTab:AddSection("Game Settings")
+
+local AntiAFK = SettingsTab:AddToggle("AntiAFK", {
+    Title = "Anti AFK",
+    Default = true,
+    Callback = function(value)
+        getgenv().AntiAFK = value
+    end
+})
+
+local BlackScreen = SettingsTab:AddToggle("BlackScreen", {
+    Title = "Black Screen",
+    Default = false,
+    Callback = function(value)
+        getgenv().StartBlackScreen = value
+    end
+})
+
+local WhiteScreen = SettingsTab:AddToggle("WhiteScreen", {
+    Title = "White Screen",
+    Default = false,
+    Callback = function(value)
+        getgenv().WhiteScreen = value
+        if value then
+            RunService:Set3dRenderingEnabled(false)
+        else
+            RunService:Set3dRenderingEnabled(true)
+        end
+    end
+})
+
+local HideMob = SettingsTab:AddToggle("HideMob", {
+    Title = "Hide Mobs",
+    Default = false,
+    Callback = function(value)
+        getgenv().HideMob = value
+    end
+})
+
+local RemoveText = SettingsTab:AddToggle("RemoveText", {
+    Title = "Remove Damage Text",
+    Default = true,
+    Callback = function(value)
+        getgenv().RemoveText = value
+        ReplicatedStorage.Assets.GUI.DamageCounter.Enabled = not value
+    end
+})
+
+-- //==================== ESP TAB ====================//
+local ESPTab = Tabs.ESP
+
+local ESPSection = ESPTab:AddSection("ESP Settings")
+
+local IslandESP = ESPTab:AddToggle("IslandESP", {
+    Title = "ESP Islands",
+    Default = false,
+    Callback = function(value)
+        getgenv().IslandESP = value
+    end
+})
+
+local FruitESP = ESPTab:AddToggle("FruitESP", {
+    Title = "ESP Fruits",
+    Default = false,
+    Callback = function(value)
+        getgenv().FruitESP = value
+    end
+})
+
+local PlayerESP = ESPTab:AddToggle("PlayerESP", {
+    Title = "ESP Players",
+    Default = false,
+    Callback = function(value)
+        getgenv().PlayerESP = value
+    end
+})
+
+-- //==================== PVP TAB ====================//
+local PVPTab = Tabs.PVP
+
+local PlayerSection = PVPTab:AddSection("Player Selection")
+
+local PlayerDropdown = PVPTab:AddDropdown("PlayerSelect", {
+    Title = "Select Player",
+    Values = {},
+    Callback = function(value)
+        getgenv().SelectPlayer = value
+    end
+})
+
+task.spawn(function()
+    while true do
+        local players = {}
+        for _, player in ipairs(Players:GetPlayers()) do
+            if player ~= LP then
+                table.insert(players, player.Name)
+            end
+        end
+        PlayerDropdown:SetValues(players)
+        task.wait(5)
+    end
+end)
+
+local PVPSection = PVPTab:AddSection("PVP Settings")
+
+local TeleportPlayer = PVPTab:AddToggle("TeleportPlayer", {
+    Title = "Teleport to Player",
+    Default = false,
+    Callback = function(value)
+        getgenv().TeleportPlayer = value
+    end
+})
+
+local AimbotToggle = PVPTab:AddToggle("AimbotToggle", {
+    Title = "Auto Aimbot",
+    Default = false,
+    Callback = function(value)
+        getgenv().Aimbot = value
+    end
+})
+
+local AimbotGun = PVPTab:AddToggle("AimbotGun", {
+    Title = "Auto Aimbot Gun",
+    Default = false,
+    Callback = function(value)
+        getgenv().AimbotGun = value
+    end
+})
+
+local SafeSection = PVPTab:AddSection("Safe Mode")
+
+local SafeToggle = PVPTab:AddToggle("SafeToggle", {
+    Title = "Safe Mode",
+    Default = false,
+    Callback = function(value)
+        getgenv().SafeMode = value
+    end
+})
+
+local SafeSlider = PVPTab:AddSlider("SafeSlider", {
+    Title = "Safe Mode Health %",
+    Default = 30,
+    Min = 0,
+    Max = 100,
+    Rounding = 5,
+    Callback = function(value)
+        getgenv().Safe = value
+    end
+})
+
+local WalkSection = PVPTab:AddSection("Walk Speed")
+
+local WalkToggle = PVPTab:AddToggle("WalkToggle", {
+    Title = "Change Walk Speed",
+    Default = false,
+    Callback = function(value)
+        getgenv().WalkSpeedToggle = value
+    end
+})
+
+local WalkInput = PVPTab:AddInput("WalkInput", {
+    Title = "Walk Speed Value",
+    Default = "100",
+    Placeholder = "100",
+    Numeric = true,
+    Finished = true,
+    Callback = function(value)
+        getgenv().WalkSpeed = tonumber(value) or 16
+    end
+})
+
+task.spawn(function()
+    while true do
+        pcall(function()
+            if getgenv().WalkSpeedToggle then
+                local char = LP.Character
+                if char and char:FindFirstChild("Humanoid") then
+                    char.Humanoid.WalkSpeed = getgenv().WalkSpeed or 16
+                end
+            end
+        end)
+        task.wait(0.1)
+    end
+end)
+
+local NoClipToggle = PVPTab:AddToggle("NoClipToggle", {
+    Title = "No Clip",
+    Default = false,
+    Callback = function(value)
+        getgenv().NoClip = value
+    end
+})
+
+task.spawn(function()
+    while true do
+        pcall(function()
+            if getgenv().NoClip then
+                local char = LP.Character
+                if char then
+                    for _, part in ipairs(char:GetDescendants()) do
+                        if part:IsA("BasePart") then
+                            part.CanCollide = false
+                        end
+                    end
+                end
+            end
+        end)
+        task.wait(0.1)
+    end
+end)
+
+-- //==================== SAVE MANAGER ====================//
+SaveManager:SetLibrary(Fluent)
+InterfaceManager:SetLibrary(Fluent)
+
+SaveManager:IgnoreThemeSettings()
+SaveManager:SetIgnoreIndexes({})
+
+InterfaceManager:SetFolder("MaruHub")
+SaveManager:SetFolder("MaruHub/bloxfruits")
+
+SaveManager:BuildConfigSection(Window)
+InterfaceManager:BuildInterfaceSection(Window)
+
+SaveManager:LoadAutoloadConfig()
+
+-- //==================== UTILITY FUNCTIONS ====================//
+
+function StopTween()
+    pcall(function()
+        if tween then
+            tween:Cancel()
+            tween = nil
+        end
+        
+        local char = LP.Character
+        if char then
+            local root = char:FindFirstChild("HumanoidRootPart")
+            if root then
+                root.Anchored = true
+                task.wait(0.1)
+                root.Anchored = false
+            end
+        end
+        
+        getgenv().StopTween = false
+        getgenv().Clip = false
+        getgenv().StartMagnet = false
+    end)
+end
+
+function topos(cframe)
+    pcall(function()
+        if not LP.Character or not LP.Character:FindFirstChild("HumanoidRootPart") then
+            return
+        end
+        
+        local root = LP.Character.HumanoidRootPart
+        local distance = (cframe.Position - root.Position).Magnitude
+        
+        if distance <= 10 then
+            root.CFrame = cframe
+            return
+        end
+        
+        local tweenSpeed = getgenv().TweenSpeed or 350
+        
+        local tweenInfo = TweenInfo.new(
+            distance / tweenSpeed,
+            Enum.EasingStyle.Linear
+        )
+        
+        tween = TweenService:Create(root, tweenInfo, { CFrame = cframe })
+        tween:Play()
+        tween.Completed:Wait()
+        
+        root.CFrame = cframe
+    end)
+end
+
+function AutoHaki()
+    pcall(function()
+        if getgenv().AUTOHAKI and not LP.Character:FindFirstChild("HasBuso") then
+            ReplicatedStorage.Remotes.CommF_:InvokeServer("Buso")
+        end
+    end)
+end
+
+function EquipWeapon(weaponName)
+    pcall(function()
+        if not weaponName then return end
+        
+        local char = LP.Character
+        local backpack = LP.Backpack
+        
+        if char:FindFirstChild(weaponName) then
+            return
+        end
+        
+        local tool = backpack:FindFirstChild(weaponName)
+        if tool then
+            char.Humanoid:EquipTool(tool)
+        end
+    end)
+end
+
+function UnEquipWeapon(weaponName)
+    pcall(function()
+        local char = LP.Character
+        local tool = char:FindFirstChild(weaponName)
+        if tool then
+            tool.Parent = LP.Backpack
+        end
+    end)
+end
+
+function CheckQuest()
+    local level = LP.Data.Level.Value
+    -- Original CheckQuest logic here
+end
+
+function MaterialMon()
+    -- Original MaterialMon logic here
+end
+
+-- //==================== MAIN LOOP ====================//
+print("Maru Hub Premium v3 Loaded Successfully!")
+print("Script by KhDang")
+print("Enjoy using the script!")
+
+task.spawn(function()
+    while true do
+        if getgenv().AntiAFK then
+            pcall(function()
+                local vu = game:GetService("VirtualUser")
+                LP.Idled:Connect(function()
+                    vu:Button2Down(Vector2.new(0, 0), workspace.CurrentCamera.CFrame)
+                    task.wait(1)
+                    vu:Button2Up(Vector2.new(0, 0), workspace.CurrentCamera.CFrame)
+                end)
+            end)
+        end
+        task.wait(1)
+    end
+end)
+
+task.spawn(function()
+    while true do
+        pcall(function()
+            if getgenv().StartBlackScreen then
+                LP.PlayerGui.Main.Blackscreen.Size = UDim2.new(500, 0, 500, 500)
+            else
+                LP.PlayerGui.Main.Blackscreen.Size = UDim2.new(1, 0, 500, 500)
+            end
+        end)
+        task.wait(0.5)
+    end
+end)
+
+task.spawn(function()
+    while true do
+        if getgenv().HideMob then
+            pcall(function()
+                for _, mob in ipairs(Workspace.Enemies:GetDescendants()) do
+                    if mob:IsA("BasePart") or mob:IsA("MeshPart") then
+                        mob.Transparency = 1
+                    end
+                end
+            end)
+        end
+        task.wait(0.5)
+    end
+end)
+
+print("All systems running...")
