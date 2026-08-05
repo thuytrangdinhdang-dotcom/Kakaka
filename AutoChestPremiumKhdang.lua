@@ -1,571 +1,439 @@
--- khDang Auto chest - Blox Fruit Script
--- Bản quyền by KhDang Blox Fruit [Free]
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>KhDang-Auto-Chest V1</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            user-select: none;
+            -webkit-tap-highlight-color: transparent;
+        }
+        body {
+            background: #0a0a0f;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            padding: 12px;
+            overflow: hidden;
+        }
+        .drag-wrapper {
+            position: relative;
+            width: 100%;
+            max-width: 420px;
+            margin: 0 auto;
+            touch-action: none;
+            cursor: grab;
+            transition: filter 0.2s;
+            z-index: 10;
+        }
+        .drag-wrapper:active { cursor: grabbing; }
+        .chest-card {
+            background: linear-gradient(145deg, #1e1a2b, #14101f);
+            border-radius: 36px;
+            padding: 20px 18px 24px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.8), 0 0 0 1px rgba(255,215,100,0.15);
+            backdrop-filter: blur(2px);
+            position: relative;
+            overflow: hidden;
+            border: 1px solid #ffd96644;
+            transition: all 0.3s ease;
+        }
+        .chest-card::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 500 400"><rect width="500" height="400" fill="%231a1428"/><circle cx="120" cy="100" r="60" fill="%23ffb3c6" opacity="0.25"/><circle cx="380" cy="280" r="80" fill="%23b8a9c9" opacity="0.2"/><circle cx="250" cy="180" r="100" fill="%23f2d9e6" opacity="0.12"/><path d="M150 300 L200 240 L250 290 L300 220 L350 270 L400 230 L430 280" stroke="%23ffe4b5" stroke-width="4" fill="none" opacity="0.25"/><circle cx="80" cy="320" r="35" fill="%23ffd9b3" opacity="0.2"/><circle cx="420" cy="70" r="45" fill="%23c9b1d9" opacity="0.2"/></svg>') center/cover no-repeat;
+            opacity: 0.5;
+            pointer-events: none;
+            border-radius: 36px;
+        }
+        .chest-content { position: relative; z-index: 2; }
+        .chest-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 14px;
+            padding-bottom: 6px;
+            border-bottom: 1px solid #ffd96633;
+        }
+        .chest-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+            background: linear-gradient(135deg, #feda7a, #fccf5c);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            text-shadow: 0 0 12px #fbbf2440;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .chest-title small {
+            font-size: 0.75rem;
+            font-weight: 400;
+            color: #b8a5d9;
+            background: #2a1f3b;
+            padding: 2px 10px;
+            border-radius: 40px;
+            letter-spacing: 0.3px;
+            background: #2f2342;
+            color: #d9c7ff;
+        }
+        .header-actions { display: flex; gap: 10px; align-items: center; }
+        .icon-btn {
+            background: rgba(255,215,100,0.08);
+            border: 1px solid #ffd96644;
+            color: #f5e3c9;
+            width: 36px;
+            height: 36px;
+            border-radius: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.4rem;
+            font-weight: 500;
+            transition: 0.2s;
+            backdrop-filter: blur(4px);
+            background: #1f1a2ecc;
+            cursor: pointer;
+            box-shadow: 0 4px 8px #00000033;
+            line-height: 1;
+        }
+        .icon-btn:active { transform: scale(0.90); background: #ffd96622; }
+        .icon-btn.close-btn { color: #ffa79b; border-color: #ff6b5b55; }
+        .icon-btn.close-btn:active { background: #ff5b4b33; }
+        .icon-btn.minimize-btn { color: #b8d9ff; border-color: #6ba3ff55; }
+        .icon-btn.minimize-btn:active { background: #4b8bff33; }
+        .menu-grid { display: flex; flex-direction: column; gap: 14px; margin: 8px 0 6px; }
+        .menu-row {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: space-between;
+            gap: 8px;
+            background: #0f0c1a66;
+            backdrop-filter: blur(6px);
+            padding: 8px 16px 8px 20px;
+            border-radius: 60px;
+            border: 1px solid #ffd96633;
+            box-shadow: inset 0 1px 2px #ffffff0a;
+        }
+        .menu-label {
+            color: #ece4f0;
+            font-weight: 600;
+            font-size: 0.95rem;
+            letter-spacing: 0.3px;
+            text-shadow: 0 1px 4px #00000066;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .menu-label span { color: #fbc85a; margin-right: 4px; }
+        .menu-btn-group { display: flex; gap: 8px; }
+        .action-btn {
+            background: #2c2340;
+            border: 1px solid #ffd96655;
+            color: #f5e8d4;
+            padding: 6px 16px;
+            border-radius: 40px;
+            font-weight: 600;
+            font-size: 0.85rem;
+            letter-spacing: 0.4px;
+            backdrop-filter: blur(4px);
+            background: #1f1a2fcc;
+            transition: 0.15s;
+            cursor: pointer;
+            box-shadow: 0 2px 6px #00000044;
+            min-width: 70px;
+            text-align: center;
+        }
+        .action-btn:active { transform: scale(0.92); background: #3d2f58; }
+        .action-btn.primary {
+            background: #d4a84b;
+            border-color: #f7d78a;
+            color: #1a1425;
+            font-weight: 700;
+            box-shadow: 0 0 12px #f7c45a55;
+        }
+        .action-btn.primary:active { background: #f0c45a; }
+        .action-btn.secondary { background: #2a1f3b; border-color: #7f6b9a; color: #d5c4f0; }
+        .server-row { margin-top: 6px; display: flex; justify-content: center; }
+        .server-btn {
+            background: #1b152b;
+            border: 1px solid #ffd96655;
+            padding: 8px 28px;
+            border-radius: 60px;
+            color: #e7d9ff;
+            font-weight: 600;
+            font-size: 0.9rem;
+            letter-spacing: 1px;
+            backdrop-filter: blur(4px);
+            background: #1a1428cc;
+            transition: 0.15s;
+            cursor: pointer;
+            width: 100%;
+            text-align: center;
+            box-shadow: 0 2px 8px #00000055;
+        }
+        .server-btn:active { transform: scale(0.94); background: #2f2148; }
+        .chest-card.minimized {
+            padding: 14px 18px;
+            border-radius: 60px;
+            background: #181325;
+            border-color: #ffd96677;
+        }
+        .chest-card.minimized .menu-grid,
+        .chest-card.minimized .server-row { display: none; }
+        .chest-card.minimized .chest-header { margin-bottom: 0; border-bottom: none; padding-bottom: 0; }
+        .chest-card.minimized .chest-title { font-size: 1.2rem; }
+        .popup-overlay {
+            position: fixed;
+            inset: 0;
+            background: #000000cc;
+            backdrop-filter: blur(8px);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 999;
+            padding: 20px;
+            animation: fadeIn 0.2s ease;
+        }
+        .popup-overlay.active { display: flex; }
+        .popup-box {
+            background: #1f1a2e;
+            border-radius: 48px;
+            padding: 32px 24px 28px;
+            max-width: 340px;
+            width: 100%;
+            border: 1px solid #ffd96666;
+            box-shadow: 0 30px 60px #000000cc;
+            text-align: center;
+            animation: slideUp 0.25s ease;
+        }
+        .popup-box p {
+            color: #f5ecf0;
+            font-size: 1.2rem;
+            font-weight: 500;
+            margin-bottom: 28px;
+            letter-spacing: 0.3px;
+            text-shadow: 0 1px 8px #00000088;
+            line-height: 1.4;
+        }
+        .popup-box p small {
+            display: block;
+            font-weight: 300;
+            font-size: 0.9rem;
+            color: #b8a9d9;
+            margin-top: 6px;
+        }
+        .popup-actions { display: flex; gap: 16px; justify-content: center; }
+        .popup-actions button {
+            flex: 1;
+            padding: 12px 0;
+            border-radius: 60px;
+            font-weight: 700;
+            font-size: 1rem;
+            border: none;
+            cursor: pointer;
+            transition: 0.15s;
+            background: #2f2347;
+            color: #e7d9ff;
+            border: 1px solid #7f6b9a77;
+        }
+        .popup-actions button:active { transform: scale(0.92); }
+        .popup-actions .btn-yes {
+            background: #d4a84b;
+            color: #1a1425;
+            border-color: #f7d78a;
+            font-weight: 800;
+        }
+        .popup-actions .btn-yes:active { background: #f0c45a; }
+        .popup-actions .btn-no { background: #2f2347; color: #d5c4f0; }
+        .popup-actions .btn-no:active { background: #3f2f5a; }
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(30px) scale(0.94); }
+            to { opacity: 1; transform: translateY(0) scale(1); }
+        }
+        .credit {
+            text-align: center;
+            color: #433b57;
+            font-size: 0.6rem;
+            letter-spacing: 0.5px;
+            margin-top: 12px;
+            opacity: 0.5;
+        }
+    </style>
+</head>
+<body>
+    <div class="drag-wrapper" id="dragWrapper">
+        <div class="chest-card" id="chestCard">
+            <div class="chest-content">
+                <div class="chest-header">
+                    <div class="chest-title">
+                        KhDang-Auto-Chest <small>V1</small>
+                    </div>
+                    <div class="header-actions">
+                        <button class="icon-btn minimize-btn" id="minimizeBtn">−</button>
+                        <button class="icon-btn close-btn" id="closeBtn">✕</button>
+                    </div>
+                </div>
+                <div class="menu-grid" id="menuGrid">
+                    <div class="menu-row">
+                        <span class="menu-label"><span>▶</span> BẮT ĐẦU FARM</span>
+                        <div class="menu-btn-group">
+                            <button class="action-btn primary" id="startFarmBtn">FARM</button>
+                        </div>
+                    </div>
+                    <div class="menu-row">
+                        <span class="menu-label"><span>⏸</span> DỤNG FARM</span>
+                        <div class="menu-btn-group">
+                            <button class="action-btn secondary" id="stopFarmBtn">DỪNG</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="server-row">
+                    <button class="server-btn" id="switchServerBtn">CHUYỂN SERVER</button>
+                </div>
+                <div class="credit">⚡ drag · anime edition</div>
+            </div>
+        </div>
+    </div>
+    <div class="popup-overlay" id="popupOverlay">
+        <div class="popup-box">
+            <p>
+                Bạn có muốn tắt script Auto Chest?<br>
+                <small>nhấn "Có" để tắt hoàn toàn</small>
+            </p>
+            <div class="popup-actions">
+                <button class="btn-yes" id="popupYes">Có</button>
+                <button class="btn-no" id="popupNo">Không (quay lại)</button>
+            </div>
+        </div>
+    </div>
+    <script>
+        (function() {
+            'use strict';
 
-local Players = game:GetService("Players")
-local Player = Players.LocalPlayer
-local Character = Player.Character or Player.CharacterAdded:Wait()
-local Humanoid = Character:WaitForChild("Humanoid")
+            const dragWrapper = document.getElementById('dragWrapper');
+            const chestCard = document.getElementById('chestCard');
+            const minimizeBtn = document.getElementById('minimizeBtn');
+            const closeBtn = document.getElementById('closeBtn');
+            const popupOverlay = document.getElementById('popupOverlay');
+            const popupYes = document.getElementById('popupYes');
+            const popupNo = document.getElementById('popupNo');
+            const menuGrid = document.getElementById('menuGrid');
 
--- Tạo ScreenGui
-local ScreenGui = Instance.new("ScreenGui")
-ScreenGui.Name = "khDangAutoChest"
-ScreenGui.ResetOnSpawn = false
-ScreenGui.Parent = Player.PlayerGui
+            let isMinimized = false;
+            let posX = 0, posY = 0, startX = 0, startY = 0, isDragging = false;
 
--- Biến trạng thái
-local isTeleporting = false
-local chestCount = 0
-local teleportTask = nil
-local isMenuVisible = true
+            function onDragStart(e) {
+                const touch = e.touches ? e.touches[0] : e;
+                startX = touch.clientX - posX;
+                startY = touch.clientY - posY;
+                isDragging = true;
+                dragWrapper.style.cursor = 'grabbing';
+                e.preventDefault?.();
+            }
 
--- Hàm lấy tất cả rương với vị trí
-local function getAllChestsWithPosition()
-    local chests = {}
-    for _, v in pairs(workspace:GetDescendants()) do
-        if v:IsA("Model") and v.Name:find("Chest") then
-            local primaryPart = v:FindFirstChild("PrimaryPart") or v:FindFirstChild("Head") or v:FindFirstChild("HumanoidRootPart")
-            if primaryPart then
-                table.insert(chests, {
-                    model = v,
-                    position = primaryPart.Position,
-                    part = primaryPart
-                })
-            end
-        end
-    end
-    return chests
-end
+            function onDragMove(e) {
+                if (!isDragging) return;
+                const touch = e.touches ? e.touches[0] : e;
+                let newX = touch.clientX - startX;
+                let newY = touch.clientY - startY;
+                const rect = dragWrapper.getBoundingClientRect();
+                const maxX = window.innerWidth - rect.width;
+                const maxY = window.innerHeight - rect.height;
+                newX = Math.min(Math.max(newX, 0), maxX);
+                newY = Math.min(Math.max(newY, 0), maxY);
+                posX = newX;
+                posY = newY;
+                dragWrapper.style.transform = `translate(${posX}px, ${posY}px)`;
+                e.preventDefault?.();
+            }
 
--- Hàm teleport đến rương
-local function teleportToChest(chestData)
-    if not chestData or not chestData.part then return end
-    local pos = chestData.position + Vector3.new(0, 5, 0)
-    Character:SetPrimaryPartCFrame(CFrame.new(pos))
-    wait(0.05)
-end
+            function onDragEnd(e) {
+                if (isDragging) {
+                    isDragging = false;
+                    dragWrapper.style.cursor = 'grab';
+                }
+            }
 
--- Hàm tìm rương gần nhất
-local function findNearestChest()
-    local chests = getAllChestsWithPosition()
-    if #chests == 0 then return nil end
-    local nearest = nil
-    local minDist = math.huge
-    local charPos = Character.PrimaryPart.Position
-    for _, chest in pairs(chests) do
-        if chest.part then
-            local dist = (chest.position - charPos).Magnitude
-            if dist < minDist then
-                minDist = dist
-                nearest = chest
-            end
-        end
-    end
-    return nearest
-end
+            dragWrapper.addEventListener('mousedown', onDragStart);
+            document.addEventListener('mousemove', onDragMove);
+            document.addEventListener('mouseup', onDragEnd);
+            dragWrapper.addEventListener('touchstart', onDragStart, { passive: false });
+            document.addEventListener('touchmove', onDragMove, { passive: false });
+            document.addEventListener('touchend', onDragEnd);
 
--- Hàm tìm rương xa nhất
-local function findFarthestChest()
-    local chests = getAllChestsWithPosition()
-    if #chests == 0 then return nil end
-    local farthest = nil
-    local maxDist = -math.huge
-    local charPos = Character.PrimaryPart.Position
-    for _, chest in pairs(chests) do
-        if chest.part then
-            local dist = (chest.position - charPos).Magnitude
-            if dist > maxDist then
-                maxDist = dist
-                farthest = chest
-            end
-        end
-    end
-    return farthest
-end
+            function toggleMinimize() {
+                isMinimized = !isMinimized;
+                chestCard.classList.toggle('minimized', isMinimized);
+                minimizeBtn.textContent = isMinimized ? '+' : '−';
+            }
 
--- Hàm lấy rương ngẫu nhiên
-local function getRandomChest()
-    local chests = getAllChestsWithPosition()
-    if #chests == 0 then return nil end
-    return chests[math.random(1, #chests)]
-end
+            minimizeBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                toggleMinimize();
+            });
 
--- Hàm reset nhân vật
-local function resetCharacter()
-    Character:BreakJoints()
-end
+            closeBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                popupOverlay.classList.add('active');
+            });
 
--- Biến chế độ farm
-local farmMode = "nearest"
+            popupYes.addEventListener('click', () => {
+                dragWrapper.style.display = 'none';
+                popupOverlay.classList.remove('active');
+                console.log('Script Auto Chest đã tắt hoàn toàn.');
+            });
 
--- Hàm xử lý teleport
-local function startTeleporting(mode)
-    if isTeleporting then return end
-    isTeleporting = true
-    chestCount = 0
-    farmMode = mode or "nearest"
-    teleportTask = game:GetService("RunService").Heartbeat:Connect(function()
-        if not isTeleporting then 
-            teleportTask:Disconnect()
-            return 
-        end
-        local targetChest = nil
-        if farmMode == "nearest" then
-            targetChest = findNearestChest()
-        elseif farmMode == "farthest" then
-            targetChest = findFarthestChest()
-        elseif farmMode == "random" then
-            targetChest = getRandomChest()
-        end
-        if targetChest then
-            teleportToChest(targetChest)
-            chestCount = chestCount + 1
-            if chestCount >= 10 then
-                resetCharacter()
-                chestCount = 0
-            end
-        end
-    end)
-end
+            popupNo.addEventListener('click', () => {
+                popupOverlay.classList.remove('active');
+            });
 
-local function stopTeleporting()
-    isTeleporting = false
-    if teleportTask then
-        teleportTask:Disconnect()
-        teleportTask = nil
-    end
-end
+            popupOverlay.addEventListener('click', (e) => {
+                if (e.target === popupOverlay) {
+                    popupOverlay.classList.remove('active');
+                }
+            });
 
--- === TẠO NÚT ẨN/HIỆN MENU (BANANA HUB STYLE) ===
-local ToggleButton = Instance.new("ImageButton")
-ToggleButton.Size = UDim2.new(0, 65, 0, 65)
-ToggleButton.Position = UDim2.new(0.02, 0, 0.5, -32)
-ToggleButton.BackgroundColor3 = Color3.fromRGB(20, 20, 30)
-ToggleButton.BackgroundTransparency = 0.1
-ToggleButton.BorderSizePixel = 3
-ToggleButton.BorderColor3 = Color3.fromRGB(255, 200, 0)
-ToggleButton.Image = "rbxassetid://1000016099"
-ToggleButton.ScaleType = Enum.ScaleType.Stretch
-ToggleButton.Parent = ScreenGui
+            document.getElementById('startFarmBtn').addEventListener('click', () => {
+                alert('▶ BẮT ĐẦU FARM');
+            });
+            document.getElementById('stopFarmBtn').addEventListener('click', () => {
+                alert('⏸ DỪNG FARM');
+            });
+            document.getElementById('switchServerBtn').addEventListener('click', () => {
+                alert('🔄 CHUYỂN SERVER');
+            });
 
--- Glow vàng cho nút
-local GlowFrame = Instance.new("Frame")
-GlowFrame.Size = UDim2.new(1, 16, 1, 16)
-GlowFrame.Position = UDim2.new(0, -8, 0, -8)
-GlowFrame.BackgroundColor3 = Color3.fromRGB(255, 200, 0)
-GlowFrame.BackgroundTransparency = 0.85
-GlowFrame.BorderSizePixel = 0
-GlowFrame.Parent = ToggleButton
+            const rect = dragWrapper.getBoundingClientRect();
+            posX = Math.max(0, (window.innerWidth - rect.width) / 2);
+            posY = Math.max(0, (window.innerHeight - rect.height) / 2 - 20);
+            dragWrapper.style.transform = `translate(${posX}px, ${posY}px)`;
+            dragWrapper.style.cursor = 'grab';
 
--- Tooltip
-local Tooltip = Instance.new("TextLabel")
-Tooltip.Size = UDim2.new(0, 160, 0, 30)
-Tooltip.Position = UDim2.new(1.15, 0, 0.2, 0)
-Tooltip.BackgroundColor3 = Color3.fromRGB(10, 10, 20)
-Tooltip.BackgroundTransparency = 0.2
-Tooltip.BorderSizePixel = 2
-Tooltip.BorderColor3 = Color3.fromRGB(255, 200, 0)
-Tooltip.Text = "🍌 khDang Auto Chest"
-Tooltip.TextColor3 = Color3.fromRGB(255, 200, 0)
-Tooltip.TextSize = 14
-Tooltip.Font = Enum.Font.GothamBold
-Tooltip.Visible = false
-Tooltip.Parent = ToggleButton
+            window.addEventListener('resize', () => {
+                const rectNow = dragWrapper.getBoundingClientRect();
+                const maxX = window.innerWidth - rectNow.width;
+                const maxY = window.innerHeight - rectNow.height;
+                posX = Math.min(Math.max(posX, 0), maxX);
+                posY = Math.min(Math.max(posY, 0), maxY);
+                dragWrapper.style.transform = `translate(${posX}px, ${posY}px)`;
+            });
 
-ToggleButton.MouseEnter:Connect(function() Tooltip.Visible = true end)
-ToggleButton.MouseLeave:Connect(function() Tooltip.Visible = false end)
-
--- === TẠO MAIN MENU (BANANA HUB PREMIUM STYLE) ===
-local Main = Instance.new("Frame")
-Main.Size = UDim2.new(0, 500, 0, 620)
-Main.Position = UDim2.new(0.5, -250, 0.5, -310)
-Main.BackgroundColor3 = Color3.fromRGB(10, 10, 20)
-Main.BackgroundTransparency = 0.05
-Main.BorderSizePixel = 0
-Main.ClipsDescendants = true
-Main.Active = true
-Main.Draggable = true
-Main.Visible = true
-Main.Parent = ScreenGui
-
--- Background với hiệu ứng
-local BgFrame = Instance.new("Frame")
-BgFrame.Size = UDim2.new(1, 0, 1, 0)
-BgFrame.BackgroundColor3 = Color3.fromRGB(15, 15, 30)
-BgFrame.BackgroundTransparency = 0.3
-BgFrame.BorderSizePixel = 0
-BgFrame.Parent = Main
-
--- Viền vàng đặc trưng Banana Hub
-local Border = Instance.new("Frame")
-Border.Size = UDim2.new(1, 0, 1, 0)
-Border.BackgroundColor3 = Color3.fromRGB(255, 200, 0)
-Border.BackgroundTransparency = 0.85
-Border.BorderSizePixel = 3
-Border.BorderColor3 = Color3.fromRGB(255, 200, 0)
-Border.Parent = Main
-
--- Header Banana Hub Style
-local Header = Instance.new("Frame")
-Header.Size = UDim2.new(1, 0, 0, 90)
-Header.BackgroundColor3 = Color3.fromRGB(255, 200, 0)
-Header.BackgroundTransparency = 0.15
-Header.BorderSizePixel = 0
-Header.Parent = Main
-
-local HeaderGrad = Instance.new("UIGradient")
-HeaderGrad.Color = ColorSequence.new({
-    ColorSequenceKeypoint.new(0, Color3.fromRGB(255, 200, 0)),
-    ColorSequenceKeypoint.new(0.5, Color3.fromRGB(255, 180, 0)),
-    ColorSequenceKeypoint.new(1, Color3.fromRGB(230, 160, 0))
-})
-HeaderGrad.Parent = Header
-
--- Icon Banana
-local HeaderIcon = Instance.new("ImageLabel")
-HeaderIcon.Size = UDim2.new(0, 55, 0, 55)
-HeaderIcon.Position = UDim2.new(0.04, 0, 0.2, 0)
-HeaderIcon.BackgroundTransparency = 1
-HeaderIcon.Image = "rbxassetid://1000016099"
-HeaderIcon.Parent = Header
-
--- Tiêu đề
-local Title = Instance.new("TextLabel")
-Title.Size = UDim2.new(1, -80, 0.5, 0)
-Title.Position = UDim2.new(0.15, 0, 0.05, 0)
-Title.BackgroundTransparency = 1
-Title.Text = "🍌 khDang Auto Chest"
-Title.TextColor3 = Color3.fromRGB(255, 255, 255)
-Title.TextSize = 30
-Title.TextXAlignment = Enum.TextXAlignment.Left
-Title.Font = Enum.Font.GothamBold
-Title.TextStrokeColor3 = Color3.fromRGB(0, 0, 0)
-Title.TextStrokeTransparency = 0.4
-Title.Parent = Header
-
--- Subtitle
-local SubTitle = Instance.new("TextLabel")
-SubTitle.Size = UDim2.new(1, -80, 0.35, 0)
-SubTitle.Position = UDim2.new(0.15, 0, 0.55, 0)
-SubTitle.BackgroundTransparency = 1
-SubTitle.Text = "💎 Premium Auto Farm Chest | v3.0"
-SubTitle.TextColor3 = Color3.fromRGB(255, 220, 150)
-SubTitle.TextSize = 14
-SubTitle.TextXAlignment = Enum.TextXAlignment.Left
-SubTitle.Font = Enum.Font.Gotham
-SubTitle.Parent = Header
-
--- === KHU VỰC CHỌN CHẾ ĐỘ (BANANA CARD) ===
-local ModeCard = Instance.new("Frame")
-ModeCard.Size = UDim2.new(0.92, 0, 0, 55)
-ModeCard.Position = UDim2.new(0.04, 0, 0.18, 0)
-ModeCard.BackgroundColor3 = Color3.fromRGB(20, 20, 40)
-ModeCard.BackgroundTransparency = 0.3
-ModeCard.BorderSizePixel = 2
-ModeCard.BorderColor3 = Color3.fromRGB(255, 200, 0)
-ModeCard.Parent = Main
-
-local ModeLabel = Instance.new("TextLabel")
-ModeLabel.Size = UDim2.new(0.2, 0, 1, 0)
-ModeLabel.Position = UDim2.new(0.03, 0, 0, 0)
-ModeLabel.BackgroundTransparency = 1
-ModeLabel.Text = "🍌 Mode:"
-ModeLabel.TextColor3 = Color3.fromRGB(255, 200, 0)
-ModeLabel.TextSize = 16
-ModeLabel.TextXAlignment = Enum.TextXAlignment.Left
-ModeLabel.Font = Enum.Font.GothamBold
-ModeLabel.Parent = ModeCard
-
--- Nút chọn chế độ (Banana Style)
-local function createModeButton(text, mode, pos)
-    local btn = Instance.new("TextButton")
-    btn.Size = UDim2.new(0.23, 0, 0.8, 0)
-    btn.Position = UDim2.new(pos, 0, 0.1, 0)
-    btn.BackgroundColor3 = Color3.fromRGB(255, 200, 0)
-    btn.BackgroundTransparency = 0.4
-    btn.BorderSizePixel = 2
-    btn.BorderColor3 = Color3.fromRGB(255, 200, 0)
-    btn.Text = text
-    btn.TextColor3 = Color3.fromRGB(255, 255, 255)
-    btn.TextSize = 13
-    btn.Font = Enum.Font.GothamBold
-    btn.Parent = ModeCard
-    return btn
-end
-
-local ModeBtn1 = createModeButton("📌 Gần nhất", "nearest", 0.24)
-local ModeBtn2 = createModeButton("🚀 Xa nhất", "farthest", 0.49)
-local ModeBtn3 = createModeButton("🎲 Ngẫu nhiên", "random", 0.74)
-
--- Xử lý chọn chế độ
-local function updateModeButtons(selected)
-    local buttons = {ModeBtn1, ModeBtn2, ModeBtn3}
-    local modes = {"nearest", "farthest", "random"}
-    for i, btn in pairs(buttons) do
-        if modes[i] == selected then
-            btn.BackgroundColor3 = Color3.fromRGB(255, 200, 0)
-            btn.BackgroundTransparency = 0.2
-            btn.BorderColor3 = Color3.fromRGB(255, 200, 0)
-            btn.TextColor3 = Color3.fromRGB(255, 255, 255)
-            btn.Font = Enum.Font.GothamBold
-        else
-            btn.BackgroundColor3 = Color3.fromRGB(30, 30, 50)
-            btn.BackgroundTransparency = 0.5
-            btn.BorderColor3 = Color3.fromRGB(60, 60, 100)
-            btn.TextColor3 = Color3.fromRGB(180, 180, 180)
-            btn.Font = Enum.Font.Gotham
-        end
-    end
-end
-
-ModeBtn1.MouseButton1Click:Connect(function()
-    farmMode = "nearest"
-    updateModeButtons("nearest")
-    if isTeleporting then
-        stopTeleporting()
-        startTeleporting("nearest")
-        ToggleBtn.Text = "⏹ TẮT AUTO CHEST"
-    end
-end)
-
-ModeBtn2.MouseButton1Click:Connect(function()
-    farmMode = "farthest"
-    updateModeButtons("farthest")
-    if isTeleporting then
-        stopTeleporting()
-        startTeleporting("farthest")
-        ToggleBtn.Text = "⏹ TẮT AUTO CHEST"
-    end
-end)
-
-ModeBtn3.MouseButton1Click:Connect(function()
-    farmMode = "random"
-    updateModeButtons("random")
-    if isTeleporting then
-        stopTeleporting()
-        startTeleporting("random")
-        ToggleBtn.Text = "⏹ TẮT AUTO CHEST"
-    end
-end)
-
--- === NÚT BẬT/TẮT CHÍNH (BANANA STYLE) ===
-local ToggleBtn = Instance.new("TextButton")
-ToggleBtn.Size = UDim2.new(0.6, 0, 0, 60)
-ToggleBtn.Position = UDim2.new(0.2, 0, 0.32, 0)
-ToggleBtn.BackgroundColor3 = Color3.fromRGB(255, 200, 0)
-ToggleBtn.BackgroundTransparency = 0.2
-ToggleBtn.BorderSizePixel = 3
-ToggleBtn.BorderColor3 = Color3.fromRGB(255, 200, 0)
-ToggleBtn.Text = "▶ BẬT AUTO CHEST"
-ToggleBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
-ToggleBtn.TextSize = 22
-ToggleBtn.Font = Enum.Font.GothamBold
-ToggleBtn.TextStrokeColor3 = Color3.fromRGB(0, 0, 0)
-ToggleBtn.TextStrokeTransparency = 0.3
-ToggleBtn.Parent = Main
-
--- Glow vàng
-local BtnGlow = Instance.new("Frame")
-BtnGlow.Size = UDim2.new(1, 12, 1, 12)
-BtnGlow.Position = UDim2.new(0, -6, 0, -6)
-BtnGlow.BackgroundColor3 = Color3.fromRGB(255, 200, 0)
-BtnGlow.BackgroundTransparency = 0.85
-BtnGlow.BorderSizePixel = 0
-BtnGlow.Parent = ToggleBtn
-
--- === STATUS CARD (BANANA STYLE) ===
-local StatusCard = Instance.new("Frame")
-StatusCard.Size = UDim2.new(0.92, 0, 0, 110)
-StatusCard.Position = UDim2.new(0.04, 0, 0.46, 0)
-StatusCard.BackgroundColor3 = Color3.fromRGB(20, 20, 40)
-StatusCard.BackgroundTransparency = 0.3
-StatusCard.BorderSizePixel = 2
-StatusCard.BorderColor3 = Color3.fromRGB(255, 200, 0)
-StatusCard.Parent = Main
-
--- Trạng thái
-local StatusText = Instance.new("TextLabel")
-StatusText.Size = UDim2.new(0.45, 0, 0.4, 0)
-StatusText.Position = UDim2.new(0.03, 0, 0, 0)
-StatusText.BackgroundTransparency = 1
-StatusText.Text = "⚪ TẮT"
-StatusText.TextColor3 = Color3.fromRGB(200, 200, 200)
-StatusText.TextSize = 22
-StatusText.TextXAlignment = Enum.TextXAlignment.Left
-StatusText.Font = Enum.Font.GothamBold
-StatusText.Parent = StatusCard
-
--- Số rương
-local ChestCounter = Instance.new("TextLabel")
-ChestCounter.Size = UDim2.new(0.45, 0, 0.4, 0)
-ChestCounter.Position = UDim2.new(0.52, 0, 0, 0)
-ChestCounter.BackgroundTransparency = 1
-ChestCounter.Text = "📦 0/10"
-ChestCounter.TextColor3 = Color3.fromRGB(255, 215, 100)
-ChestCounter.TextSize = 22
-ChestCounter.TextXAlignment = Enum.TextXAlignment.Right
-ChestCounter.Font = Enum.Font.GothamBold
-ChestCounter.Parent = StatusCard
-
--- Tổng rương
-local TotalChestsLabel = Instance.new("TextLabel")
-TotalChestsLabel.Size = UDim2.new(1, 0, 0.35, 0)
-TotalChestsLabel.Position = UDim2.new(0, 0, 0.45, 0)
-TotalChestsLabel.BackgroundTransparency = 1
-TotalChestsLabel.Text = "🌍 Tổng rương: 0"
-TotalChestsLabel.TextColor3 = Color3.fromRGB(255, 220, 150)
-TotalChestsLabel.TextSize = 15
-TotalChestsLabel.Font = Enum.Font.Gotham
-TotalChestsLabel.Parent = StatusCard
-
--- Thanh tiến trình Banana Style
-local ProgressBar = Instance.new("Frame")
-ProgressBar.Size = UDim2.new(0.94, 0, 0, 12)
-ProgressBar.Position = UDim2.new(0.03, 0, 0.85, 0)
-ProgressBar.BackgroundColor3 = Color3.fromRGB(30, 30, 50)
-ProgressBar.BackgroundTransparency = 0.4
-ProgressBar.BorderSizePixel = 2
-ProgressBar.BorderColor3 = Color3.fromRGB(255, 200, 0)
-ProgressBar.Parent = StatusCard
-
-local ProgressFill = Instance.new("Frame")
-ProgressFill.Size = UDim2.new(0, 0, 1, 0)
-ProgressFill.BackgroundColor3 = Color3.fromRGB(255, 200, 0)
-ProgressFill.BackgroundTransparency = 0.2
-ProgressFill.BorderSizePixel = 0
-ProgressFill.Parent = ProgressBar
-
--- Text trên thanh
-local ProgressText = Instance.new("TextLabel")
-ProgressText.Size = UDim2.new(1, 0, 1, 0)
-ProgressText.BackgroundTransparency = 1
-ProgressText.Text = "0%"
-ProgressText.TextColor3 = Color3.fromRGB(255, 255, 255)
-ProgressText.TextSize = 10
-ProgressText.Font = Enum.Font.GothamBold
-ProgressText.Parent = ProgressBar
-
--- === FOOTER BANANA STYLE ===
-local Footer = Instance.new("Frame")
-Footer.Size = UDim2.new(1, 0, 0, 40)
-Footer.Position = UDim2.new(0, 0, 1, -40)
-Footer.BackgroundColor3 = Color3.fromRGB(255, 200, 0)
-Footer.BackgroundTransparency = 0.1
-Footer.BorderSizePixel = 0
-Footer.Parent = Main
-
--- Bản quyền
-local Copyright = Instance.new("TextLabel")
-Copyright.Size = UDim2.new(0.5, 0, 1, 0)
-Copyright.Position = UDim2.new(0.03, 0, 0, 0)
-Copyright.BackgroundTransparency = 1
-Copyright.Text = "by KhDang Blox Fruit [Free]"
-Copyright.TextColor3 = Color3.fromRGB(255, 200, 0)
-Copyright.TextSize = 14
-Copyright.TextXAlignment = Enum.TextXAlignment.Left
-Copyright.Font = Enum.Font.GothamBold
-Copyright.TextStrokeColor3 = Color3.fromRGB(0, 0, 0)
-Copyright.TextStrokeTransparency = 0.5
-Copyright.Parent = Footer
-
--- Phím tắt
-local HotkeyText = Instance.new("TextLabel")
-HotkeyText.Size = UDim2.new(0.45, 0, 1, 0)
-HotkeyText.Position = UDim2.new(0.52, 0, 0, 0)
-HotkeyText.BackgroundTransparency = 1
-HotkeyText.Text = "⌨ Alt+T | Alt+M"
-HotkeyText.TextColor3 = Color3.fromRGB(255, 220, 150)
-HotkeyText.TextSize = 13
-HotkeyText.TextXAlignment = Enum.TextXAlignment.Right
-HotkeyText.Font = Enum.Font.Gotham
-HotkeyText.Parent = Footer
-
--- Cập nhật tổng số rương
-local function updateTotalChests()
-    local chests = getAllChestsWithPosition()
-    TotalChestsLabel.Text = "🌍 Tổng rương: " .. #chests
-end
-
-spawn(function()
-    while true do
-        wait(5)
-        updateTotalChests()
-    end
-end)
-
--- Xử lý nút Ẩn/Hiện
-ToggleButton.MouseButton1Click:Connect(function()
-    isMenuVisible = not isMenuVisible
-    Main.Visible = isMenuVisible
-    if isMenuVisible then
-        ToggleButton.BorderColor3 = Color3.fromRGB(255, 200, 0)
-        GlowFrame.BackgroundColor3 = Color3.fromRGB(255, 200, 0)
-        Tooltip.Text = "🍌 khDang Auto Chest"
-    else
-        ToggleButton.BorderColor3 = Color3.fromRGB(255, 0, 0)
-        GlowFrame.BackgroundColor3 = Color3.fromRGB(255, 0, 0)
-        Tooltip.Text = "🔴 Menu đang ẩn"
-    end
-end)
-
--- Xử lý nút Bật/Tắt
-ToggleBtn.MouseButton1Click:Connect(function()
-    if not isTeleporting then
-        startTeleporting(farmMode)
-        ToggleBtn.Text = "⏹ TẮT AUTO CHEST"
-        ToggleBtn.BackgroundColor3 = Color3.fromRGB(255, 50, 50)
-        ToggleBtn.BorderColor3 = Color3.fromRGB(255, 50, 50)
-        BtnGlow.BackgroundColor3 = Color3.fromRGB(255, 50, 50)
-        StatusText.Text = "🟢 ĐANG CHẠY..."
-        StatusText.TextColor3 = Color3.fromRGB(0, 255, 100)
-    else
-        stopTeleporting()
-        ToggleBtn.Text = "▶ BẬT AUTO CHEST"
-        ToggleBtn.BackgroundColor3 = Color3.fromRGB(255, 200, 0)
-        ToggleBtn.BorderColor3 = Color3.fromRGB(255, 200, 0)
-        BtnGlow.BackgroundColor3 = Color3.fromRGB(255, 200, 0)
-        StatusText.Text = "⚪ TẮT"
-        StatusText.TextColor3 = Color3.fromRGB(200, 200, 200)
-        ChestCounter.Text = "📦 0/10"
-        ProgressFill.Size = UDim2.new(0, 0, 1, 0)
-        ProgressText.Text = "0%"
-    end
-end)
-
--- Cập nhật counter
-game:GetService("RunService").Heartbeat:Connect(function()
-    if isTeleporting then
-        ChestCounter.Text = "📦 " .. chestCount .. "/10"
-        local progress = chestCount / 10
-        ProgressFill.Size = UDim2.new(progress, 0, 1, 0)
-        ProgressText.Text = math.floor(progress * 100) .. "%"
-    end
-end)
-
--- Xử lý khi nhân vật respawn
-Player.CharacterAdded:Connect(function(newChar)
-    Character = newChar
-    Humanoid = Character:WaitForChild("Humanoid")
-    if isTeleporting then
-        chestCount = 0
-        ChestCounter.Text = "📦 0/10"
-        ProgressFill.Size = UDim2.new(0, 0, 1, 0)
-        ProgressText.Text = "0%"
-    end
-end)
-
--- Phím tắt
-game:GetService("UserInputService").InputBegan:Connect(function(input, gameProcessed)
-    if gameProcessed then return end
-    if input.KeyCode == Enum.KeyCode.T and input:IsModifierKeyDown(Enum.ModifierKey.Alt) then
-        ToggleBtn.MouseButton1Click:Fire()
-    end
-    if input.KeyCode == Enum.KeyCode.M and input:IsModifierKeyDown(Enum.ModifierKey.Alt) then
-        ToggleButton.MouseButton1Click:Fire()
-    end
-end)
-
-print("🍌 khDang Auto Chest đã tải thành công!")
-print("📜 Bản quyền by KhDang Blox Fruit [Free]")
-print("🌊 Đã hỗ trợ farm rương toàn bộ Sea!")
-print("⌨ Phím tắt: Alt + T để Bật/Tắt Auto Chest")
-print("⌨ Phím tắt: Alt + M để Ẩn/Hiện Menu")
+        })();
+    </script>
+</body>
+</html>
