@@ -1,3 +1,104 @@
+local Players = game:GetService("Players")
+local TweenService = game:GetService("TweenService")
+
+local player = Players.LocalPlayer
+local gui = Instance.new("ScreenGui")
+gui.Name = "KHDANG_INTRO"
+gui.IgnoreGuiInset = true
+gui.ResetOnSpawn = false
+gui.Parent = player:WaitForChild("PlayerGui")
+
+-- ẢNH NỀN MẶT TRĂNG
+local bg = Instance.new("ImageLabel")
+bg.Size = UDim2.fromScale(1, 1)
+bg.Position = UDim2.fromScale(0, 0)
+bg.BackgroundTransparency = 1
+bg.Image = "rbxassetid://71907043495686"
+bg.ScaleType = Enum.ScaleType.Crop
+bg.ImageTransparency = 0
+bg.Parent = gui
+
+-- Lớp tối nhẹ
+local dark = Instance.new("Frame")
+dark.Size = UDim2.fromScale(1, 1)
+dark.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+dark.BackgroundTransparency = 0.35
+dark.BorderSizePixel = 0
+dark.Parent = bg
+
+-- CHỮ KHÁNH ĐĂNG
+local title = Instance.new("TextLabel")
+title.AnchorPoint = Vector2.new(0.5, 0.5)
+title.Position = UDim2.fromScale(0.5, -0.2)
+title.Size = UDim2.fromScale(0.8, 0.13)
+title.BackgroundTransparency = 1
+title.Text = "Khánh Đăng⚔️"
+title.Font = Enum.Font.GothamBlack
+title.TextScaled = true
+title.TextColor3 = Color3.fromRGB(255, 215, 0)
+title.TextStrokeColor3 = Color3.fromRGB(0, 0, 0)
+title.TextStrokeTransparency = 0
+title.Parent = bg
+
+-- CHỮ NHỎ
+local sub = Instance.new("TextLabel")
+sub.AnchorPoint = Vector2.new(0.5, 0.5)
+sub.Position = UDim2.fromScale(0.5, -0.1)
+sub.Size = UDim2.fromScale(0.6, 0.05)
+sub.BackgroundTransparency = 1
+sub.Text = "tt: Khdangdepzai36"
+sub.Font = Enum.Font.GothamBold
+sub.TextScaled = true
+sub.TextColor3 = Color3.fromRGB(255, 255, 255)
+sub.TextStrokeColor3 = Color3.fromRGB(0, 0, 0)
+sub.TextStrokeTransparency = 0
+sub.Parent = bg
+
+-- HIỆU ỨNG RƠI XUỐNG
+TweenService:Create(
+title,
+TweenInfo.new(1.8, Enum.EasingStyle.Quint, Enum.EasingDirection.Out),
+{Position = UDim2.fromScale(0.5, 0.45)}
+):Play()
+
+task.wait(0.2)
+
+TweenService:Create(
+sub,
+TweenInfo.new(2, Enum.EasingStyle.Quint, Enum.EasingDirection.Out),
+{Position = UDim2.fromScale(0.5, 0.55)}
+):Play()
+
+task.wait(2.5)
+
+-- FADE OUT
+local fade = TweenInfo.new(0.8, Enum.EasingStyle.Quad)
+
+TweenService:Create(title, fade, {
+TextTransparency = 1,
+TextStrokeTransparency = 1
+}):Play()
+
+TweenService:Create(sub, fade, {
+TextTransparency = 1,
+TextStrokeTransparency = 1
+}):Play()
+
+TweenService:Create(bg, fade, {
+ImageTransparency = 1
+}):Play()
+
+task.wait(0.9)
+
+gui:Destroy()
+
+--================================
+-- CODE CHÍNH CHẠY SAU INTRO
+--================================
+
+print("Khánh Đăng⚔️ | Code chính đã load!")
+
+-- Dán code chính của bạn ở đây
 --[[ 
     SYSTEM BY KHDANG BLOXFRUIT 
     LINK GET KEY: https://notevn.com/rd6fnhru
