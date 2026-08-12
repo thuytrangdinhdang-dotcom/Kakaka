@@ -1,3 +1,51 @@
+--// KHDANG FIX LAG - Blox Fruits
+local Lighting = game:GetService("Lighting")
+local Workspace = game:GetService("Workspace")
+
+-- FPS / đồ họa thấp
+pcall(function()
+    settings().Rendering.QualityLevel = Enum.QualityLevel.Level01
+end)
+
+-- Làm Lighting đơn giản
+pcall(function()
+    Lighting.GlobalShadows = false
+    Lighting.Brightness = 1
+    Lighting.EnvironmentDiffuseScale = 0
+    Lighting.EnvironmentSpecularScale = 0
+    Lighting.FogEnd = 100000
+end)
+
+-- Xóa hiệu ứng hậu kỳ
+for _, v in ipairs(Lighting:GetChildren()) do
+    if v:IsA("PostEffect") then
+        pcall(function()
+            v.Enabled = false
+        end)
+    end
+end
+
+-- Giảm hiệu ứng trong Workspace
+for _, v in ipairs(Workspace:GetDescendants()) do
+    pcall(function()
+        if v:IsA("ParticleEmitter")
+        or v:IsA("Trail")
+        or v:IsA("Beam")
+        or v:IsA("Smoke")
+        or v:IsA("Fire")
+        or v:IsA("Sparkles") then
+            v.Enabled = false
+        elseif v:IsA("BasePart") then
+            v.Material = Enum.Material.SmoothPlastic
+            v.CastShadow = false
+            v.Reflectance = 0
+        elseif v:IsA("Decal") or v:IsA("Texture") then
+            v.Transparency = 1
+        end
+    end)
+end
+
+-- Tiếp tục code của bạn bên dưới
 local Players = game:GetService("Players")
 local TweenService = game:GetService("TweenService")
 
